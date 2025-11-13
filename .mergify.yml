@@ -1,15 +1,50 @@
-merge_protections:
-  - name: Enforce conventional commit
-    description: Make sure that we follow https://www.conventionalcommits.org/en/v1.0.0/
-    if:
-      - base = main
-    success_conditions:
-      - "title ~=
-        ^(fix|feat|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\\(.+\
-        \\))?:"
-  - name: Do not merge outdated PRs
-    description: Make sure PRs are almost up to date before merging
-    if:
-      - base = main
-    success_conditions:
-      - "#commits-behind <= 10"
+pull_request_rules:
+  - name: Notify when a PR is removed from the queue
+    description: Notify the PR author when its pull request is removed from the merge queue.
+    conditions:
+      - queue-dequeue-reason != none
+      - queue-dequeue-reason != pr-merged
+    actions:
+      comment:
+        message: >
+          Hey @{{author}}, your pull request has been dequeued due to the
+          following reason: {{queue_dequeue_reason}}.
+
+          Sorry about that, but you can requeue the PR by using `@mergifyio
+          requeue` if you think this was a mistake.
+  - name: Label conflicting pull requests
+    description: Add a label to a pull request with conflict to spot it easily
+    conditions:
+      - conflict
+      - -closed
+    actions:
+      label:
+        toggle:
+          - conflict
+  - name: Ping PR author when conflicting
+    description: Warn the pull request author when their PR are conflicting
+    conditions:
+      - conflict
+      - -closed
+    actions:
+      comment:
+        message: >
+          👋 {{author}} your PR is conflicting and needs to be updated to be
+          merged
+  - name: Make sure PR are up to date before merging
+    description: This automatically updates PRs when they are out-of-date with the
+      base branch to avoid semantic conflicts (next step is using a merge
+      queue).
+    conditions: []
+    actions:
+      update:
+  - name: Assign t-shirt size to PR
+    description: Assign a t-shirt size label to a pull request based on the number
+      of lines changed.
+    conditions:
+      - "#modified-lines >= 100"
+      - "#modified-lines < 500"
+    actions:
+      label:
+        toggle:
+          - size/L
