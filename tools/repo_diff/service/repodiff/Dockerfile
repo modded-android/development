@@ -14,7 +14,7 @@ RUN apk --no-cache add \
       && cp .gitconfig /go/bin/ \
       && cp credentials.json /go/bin/
 
-FROM alpine:3.7
+FROM alpine:3.22
 RUN apk --no-cache add \
       bash \
       git \
