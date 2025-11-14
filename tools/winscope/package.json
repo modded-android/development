@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.3.10",
-    "@angular/cli": "~14.0.0",
+    "@angular/cli": "~14.2.0",
     "@angular/compiler-cli": "^14.0.0",
     "@ngxs/devtools-plugin": "^3.7.4",
     "@types/chrome": "^0.0.204",
